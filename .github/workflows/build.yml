@@ -5,9 +5,9 @@ on:
   workflow_dispatch:
     inputs:
       z3_version:
-        description: 'Z3 version (e.g. 4.16.0.0)'
+        description: 'Z3 version (e.g. 4.13.4.0)'
         required: false
-        default: '4.16.0.0'
+        default: '4.13.4.0'
       pyodide_version:
         description: 'Pyodide version (e.g. 0.29.3)'
         required: false
@@ -21,7 +21,7 @@ on:
       - '.github/workflows/build.yml'
 
 env:
-  Z3_VERSION: ${{ github.event.inputs.z3_version || '4.16.0.0' }}
+  Z3_VERSION: ${{ github.event.inputs.z3_version || '4.13.4.0' }}
   PYODIDE_VERSION: ${{ github.event.inputs.pyodide_version || '0.29.3' }}
 
 permissions:

@@ -17,7 +17,7 @@ import micropip
 
 # Install from URL (replace with actual release URL)
 await micropip.install(
-    "https://github.com/andre-wojtowicz/z3-solver-pyodide/releases/download/z3-4.16.0.0-pyodide-0.29.3/z3_solver-4.16.0.0-py3-none-pyodide_2025_0_wasm32.whl"
+    "https://github.com/andre-wojtowicz/z3-solver-pyodide/releases/download/z3-4.13.4.0-pyodide-0.29.3/z3_solver-4.13.4.0-py3-none-pyodide_2025_0_wasm32.whl"
 )
 
 import z3
@@ -41,7 +41,7 @@ ls output/*.whl
 
 | Component   | Version         |
 |-------------|-----------------|
-| Z3 Solver   | 4.16.0.0        |
+| Z3 Solver   | 4.13.4.0        |
 | Pyodide     | 0.29.3          |
 | Python      | 3.13.2          |
 | Emscripten  | 4.0.9           |

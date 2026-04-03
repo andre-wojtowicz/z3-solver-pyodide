@@ -1,5 +1,5 @@
 # =============================================================================
-# Dockerfile: Build z3-solver 4.16.0.0 wheel for Pyodide 0.29.3
+# Dockerfile: Build z3-solver 4.13.4.0 wheel for Pyodide 0.29.3
 #
 # Pyodide 0.29.3 specs:
 #   - Python 3.13.2
@@ -12,7 +12,7 @@
 #   docker run --rm -v $(pwd)/output:/output z3-pyodide
 #
 # Result:
-#   output/z3_solver-4.16.0.0-py3-none-pyodide_2025_0_wasm32.whl
+#   output/z3_solver-4.13.4.0-py3-none-pyodide_2025_0_wasm32.whl
 # =============================================================================
 
 FROM debian:trixie-slim
@@ -76,11 +76,11 @@ RUN cd /opt/emsdk && . ./emsdk_env.sh && \
     echo "export PATH=${PATH}" >> /etc/profile.d/emsdk.sh && \
     emcc --version
 
-# ── 5. Download z3-solver 4.16.0.0 source tarball ───────────────────────────
+# ── 5. Download z3-solver 4.13.4.0 source tarball ───────────────────────────
 WORKDIR /build
 
 RUN curl -fSL \
-    "https://github.com/Z3Prover/z3/releases/download/z3-4.16.0/z3_solver-4.16.0.0.tar.gz" \
+    "https://github.com/Z3Prover/z3/releases/download/z3-4.13.4/z3_solver-4.13.4.0.tar.gz" \
     -o z3_solver.tar.gz && \
     tar xzf z3_solver.tar.gz && \
     rm z3_solver.tar.gz
@@ -92,7 +92,7 @@ RUN curl -fSL \
 # -s DISABLE_EXCEPTION_CATCHING=0 (Emscripten legacy exception mode).
 # These are incompatible with -fwasm-exceptions, so we patch them out.
 #
-WORKDIR /build/z3_solver-4.16.0.0
+WORKDIR /build/z3_solver-4.13.4.0
 
 # Patch setup.py: replace legacy Emscripten exception flags with wasm EH
 RUN sed -i \
@@ -109,7 +109,7 @@ RUN find . -name 'CMakeLists.txt' -exec sed -i \
     -e 's/-fexceptions/-fwasm-exceptions/g' \
     {} +
 
-RUN cd /opt/emsdk && . ./emsdk_env.sh && cd /build/z3_solver-4.16.0.0 && \
+RUN cd /opt/emsdk && . ./emsdk_env.sh && cd /build/z3_solver-4.13.4.0 && \
     CFLAGS="-fwasm-exceptions -g2" \
     CXXFLAGS="-fwasm-exceptions" \
     LDFLAGS="-fwasm-exceptions -sSUPPORT_LONGJMP=wasm -sWASM_BIGINT" \
@@ -122,7 +122,7 @@ RUN ls dist/*.whl && \
      echo "Built wheel:" && ls dist/*.whl)
 
 # ── 7. Copy wheel to /output on container run ───────────────────────────────
-CMD cp /build/z3_solver-4.16.0.0/dist/*.whl /output/ && \
+CMD cp /build/z3_solver-4.13.4.0/dist/*.whl /output/ && \
     echo "=== Done ===" && \
     echo "Wheel copied to /output/:" && \
     ls -lh /output/*.whl
