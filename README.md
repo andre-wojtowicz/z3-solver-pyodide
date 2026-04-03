@@ -17,7 +17,7 @@ import micropip
 
 # Install from URL (replace with actual release URL)
 await micropip.install(
-    "https://github.com/YOUR_USER/z3-solver-pyodide/releases/download/z3-4.16.0.0-pyodide-0.29.3/z3_solver-4.16.0.0-py3-none-pyodide_2025_0_wasm32.whl"
+    "https://github.com/andre-wojtowicz/z3-solver-pyodide/releases/download/z3-4.16.0.0-pyodide-0.29.3/z3_solver-4.16.0.0-py3-none-pyodide_2025_0_wasm32.whl"
 )
 
 import z3
