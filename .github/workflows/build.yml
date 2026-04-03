@@ -1,0 +1,90 @@
+name: Build z3-solver Pyodide wheel
+
+on:
+  # Manual trigger with optional version override
+  workflow_dispatch:
+    inputs:
+      z3_version:
+        description: 'Z3 version (e.g. 4.16.0.0)'
+        required: false
+        default: '4.16.0.0'
+      pyodide_version:
+        description: 'Pyodide version (e.g. 0.29.3)'
+        required: false
+        default: '0.29.3'
+
+  # Auto-trigger on Dockerfile changes
+  push:
+    branches: [main]
+    paths:
+      - 'Dockerfile'
+      - '.github/workflows/build.yml'
+
+env:
+  Z3_VERSION: ${{ github.event.inputs.z3_version || '4.16.0.0' }}
+  PYODIDE_VERSION: ${{ github.event.inputs.pyodide_version || '0.29.3' }}
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Build wheel in Docker
+        run: |
+          docker build -t z3-pyodide .
+          mkdir -p output
+          docker run --rm -v ${{ github.workspace }}/output:/output z3-pyodide
+
+      - name: Show built wheel
+        run: ls -lh output/*.whl
+
+      - name: Extract wheel filename
+        id: wheel
+        run: |
+          WHEEL_FILE=$(ls output/*.whl)
+          WHEEL_NAME=$(basename "$WHEEL_FILE")
+          echo "file=${WHEEL_FILE}" >> "$GITHUB_OUTPUT"
+          echo "name=${WHEEL_NAME}" >> "$GITHUB_OUTPUT"
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: z3-pyodide-wheel
+          path: output/*.whl
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: z3-${{ env.Z3_VERSION }}-pyodide-${{ env.PYODIDE_VERSION }}
+          name: z3-solver ${{ env.Z3_VERSION }} for Pyodide ${{ env.PYODIDE_VERSION }}
+          body: |
+            ## z3-solver ${{ env.Z3_VERSION }} — Pyodide ${{ env.PYODIDE_VERSION }} wheel
+
+            Pre-built wheel for use with [Pyodide](https://pyodide.org/) ${{ env.PYODIDE_VERSION }}.
+
+            **Specs:**
+            - Z3 Solver: ${{ env.Z3_VERSION }}
+            - Pyodide: ${{ env.PYODIDE_VERSION }}
+            - Python: 3.13
+            - Emscripten: 4.0.9
+            - ABI: `pyodide_2025_0_wasm32`
+
+            **Install in Pyodide:**
+            ```python
+            import micropip
+            await micropip.install("${{ steps.wheel.outputs.name }}")
+            ```
+            Or from URL:
+            ```python
+            await micropip.install("https://github.com/${{ github.repository }}/releases/download/z3-${{ env.Z3_VERSION }}-pyodide-${{ env.PYODIDE_VERSION }}/${{ steps.wheel.outputs.name }}")
+            ```
+          files: ${{ steps.wheel.outputs.file }}
+          draft: false
+          prerelease: false
